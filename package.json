@@ -44,6 +44,9 @@
 	},
 	"dependencies": {
 		"@tabler/icons-svelte": "^3.31.0",
+		"@zip.js/zip.js": "^2.7.57",
+		"comlink": "^4.4.2",
+		"comlink-async-generator": "^0.0.1",
 		"drizzle-orm": "^0.40.0",
 		"postgres": "^3.4.5",
 		"zod": "^3.24.2"

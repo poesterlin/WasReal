@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { toastStore } from '$lib/client/toast.svelte';
+	import { toastStore } from '$lib/toast.svelte';
 	import { slide } from 'svelte/transition';
 	import { onNavigate } from '$app/navigation';
 	import '../app.css';
@@ -20,12 +20,12 @@
 	});
 </script>
 
-<main class="overflow-y-auto">
+<main>
 	{@render children()}
 
 	{#each toastStore.toasts as toast, i (toast.id)}
 		<div
-			class="fixed bottom-4 right-4 z-50"
+			class="fixed right-4 bottom-4 z-50"
 			in:slide={{ duration: 300 }}
 			out:slide={{ duration: 300 }}
 			style="translate: 0 {i * -4}rem;"
