@@ -43,7 +43,7 @@
 	}
 </script>
 
-<div bind:this={el} class="relative max-h-[60vh]">
+<div bind:this={el} class="relative max-h-[60svh] min-h-[30svh] w-full">
 	<div class="absolute top-3 right-3 flex items-center space-x-2 text-white">
 		<button onclick={download} class="rounded border border-white bg-pink-200/50 px-2 py-1">
 			<IconDownload></IconDownload>

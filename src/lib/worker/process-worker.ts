@@ -125,7 +125,7 @@ async function getPosts() {
 }
 
 async function getProgress() {
-	return { filesStored, isProcessing, filesFused };
+	return { filesStored, isProcessing, filesFused, averageTime };
 }
 
 async function storeEntry(entry: Blob, folder: FileSystemDirectoryHandle, path: string = '') {
@@ -189,6 +189,8 @@ async function getFolder(path: string) {
 	return { folder: currentFolder, filename };
 }
 
+let canvas: OffscreenCanvas;
+let ctx: OffscreenCanvasRenderingContext2D;
 async function fuseImages(primary: string, secondary: string, options: { asBlob?: boolean } = {}) {
 	const { asBlob = false } = options;
 
@@ -198,9 +200,11 @@ async function fuseImages(primary: string, secondary: string, options: { asBlob?
 	const width = Math.max(primaryImage.width, secondaryImage.width);
 	const height = Math.max(primaryImage.height, secondaryImage.height);
 
-	const canvas = new OffscreenCanvas(width, height);
-	const ctx = canvas.getContext('2d');
-	assert(ctx, 'Canvas context not found');
+	if (!ctx) {
+		canvas = new OffscreenCanvas(width, height);
+		ctx = canvas.getContext('2d')!;
+		assert(ctx, 'Canvas context not found');
+	}
 
 	// Draw primary image
 	ctx.drawImage(primaryImage, 0, 0, width, height);
@@ -285,18 +289,31 @@ async function urlToBitmap(url: string) {
 	}
 }
 
+let averageTime = 0;
+
+/**
+ * uses filesFused as a counter to calculate the average time
+ * @param duration
+ */
+function addToAverage(duration: number) {
+	averageTime = (averageTime * filesFused + duration) / (filesFused + 1);
+}
+
 async function processAllPosts() {
 	const posts = await getPosts();
 	const zip = new ZipWriter(new BlobWriter('application/zip'), { bufferedWrite: true });
 	for (const post of posts) {
 		try {
 			const [primary, secondary] = await getImages(post);
+			const start = performance.now();
 			const blob = (await fuseImages(primary, secondary, { asBlob: true })) as Blob;
+			const end = performance.now();
+			const duration = end - start;
+			addToAverage(duration);
 			const filename = post.primary.path.split('/').at(-1)! + '.jpg';
 
 			const path = `fused/${filename}`;
 			await zip.add(path, new BlobReader(blob));
-			console.log('Fused image added to zip:', path);
 		} catch (e) {
 			console.error(e);
 		}

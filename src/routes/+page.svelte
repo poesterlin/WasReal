@@ -77,9 +77,12 @@
 			</div>
 		{:else}
 			<div class="space-y-6">
-				<div class="flex justify-center text-5xl text-white/80">
+				<button
+					class="flex justify-center text-5xl text-white/80"
+					onclick={() => fileInput!.click()}
+				>
 					<IconUpload class="h-auto w-20" />
-				</div>
+				</button>
 				<div class="space-y-4">
 					<p class="text-xl font-medium text-white">Drop your ZIP file here</p>
 					<p class="text-sm text-white/80">or</p>

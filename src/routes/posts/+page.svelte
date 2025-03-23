@@ -12,6 +12,7 @@
 	let dialog = $state<HTMLDialogElement>();
 	let open = $state(false);
 	let progress = $state(0);
+	let formattedEta = $state('');
 
 	onMount(async () => {
 		const worker = getWorkerInstance();
@@ -42,9 +43,19 @@
 
 		while (open) {
 			await new Promise((resolve) => setTimeout(resolve, 100));
-			const { filesFused } = await worker.getProgress();
+			const { filesFused, averageTime } = await worker.getProgress();
 			progress = Math.min(Math.floor((filesFused / posts.length) * 100), 100);
+			const missing = posts.length - filesFused;
+			const eta = missing * averageTime;
+			formattedEta = formatEta(eta);
 		}
+	}
+
+	function formatEta(eta: number) {
+		const seconds = Math.floor(eta / 1000) % 60;
+		const minutes = Math.floor(eta / (1000 * 60));
+
+		return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
 	}
 </script>
 
@@ -67,10 +78,10 @@
 </div>
 
 <dialog bind:this={dialog} class="glass-effect" open={false} class:open>
-	<div>
+	<div class="flex flex-col items-center gap-4">
 		<Progress {progress} />
-		<h2>Processing Images</h2>
-		<p>Please wait...</p>
+		<h2 class="underline">Processing Images</h2>
+		<p class="text-sm">ca. {formattedEta} left</p>
 	</div>
 </dialog>
 
