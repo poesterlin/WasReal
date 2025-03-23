@@ -61,9 +61,9 @@
 
 <button
 	onclick={processAllPosts}
-	class="glass-effect fixed right-4 bottom-4 z-50 rounded-lg text-white shadow-lg"
+	class="glass-effect fixed right-4 bottom-4 z-50 rounded-lg text-black shadow-lg"
 >
-	<div class="flex items-center gap-2 rounded-lg bg-pink-400/30 p-2 pr-3">
+	<div class="flex items-center gap-2 rounded-lg bg-pink-200/60 p-2 pr-5 pl-4">
 		<IconDownload></IconDownload>
 
 		Download All
@@ -78,7 +78,7 @@
 </div>
 
 <dialog bind:this={dialog} class="glass-effect" open={false} class:open>
-	<div class="flex flex-col items-center gap-4">
+	<div class="flex flex-col items-center gap-4 text-black">
 		<Progress {progress} />
 		<h2 class="underline">Processing Images</h2>
 		<p class="text-sm">ca. {formattedEta} left</p>

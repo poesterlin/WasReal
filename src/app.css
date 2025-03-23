@@ -10,7 +10,7 @@
 
 body {
     background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 25%, #fad0c4 50%, #a18cd1 75%, #fbc2eb 100%);
-    min-height: 100vh;
+    min-height: 100dvh;
 }
 
 button {

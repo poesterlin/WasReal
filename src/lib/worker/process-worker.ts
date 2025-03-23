@@ -324,6 +324,32 @@ async function processAllPosts() {
 	return url;
 }
 
+async function deleteDirectoryContent(directoryHandle: FileSystemDirectoryHandle) {
+	// recursively delete all files
+	// @ts-expect-error - entries iterator is not yet in the types
+	for await (const [name, handle] of directoryHandle.entries()) {
+		try {
+			if (handle.kind === 'directory') {
+				await deleteDirectoryContent(handle);
+			}
+
+			await directoryHandle.removeEntry(name);
+		} catch (e) {
+			console.error('Error deleting entry', name, e);
+		}
+	}
+}
+
+async function clearData() {
+	folderCache.clear();
+	filesStored = 0;
+	filesFused = 0;
+	averageTime = 0;
+
+	const root = await navigator.storage.getDirectory();
+	await deleteDirectoryContent(root);
+}
+
 function assert(condition: unknown, message: string): asserts condition {
 	if (!condition) {
 		throw new Error(message);
@@ -339,6 +365,7 @@ const methods = {
 	getPosts,
 	getImages,
 	fuseImages,
+	clearData,
 	processAllPosts
 } satisfies Record<string, PromiseMethod>;
 
