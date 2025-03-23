@@ -7,13 +7,9 @@
 
 ## Overview
 
-WasReal is a tool that allows you to explore, edit, and export your personal BeReal data. Have you ever wanted to:
+WasReal is a tool that allows you to explore, edit, and export your personal BeReal data. Have you ever wanted to create a personal archive of your BeReal memories?
 
-- Analyze your BeReal habits?
-- Create a personal archive of your BeReal memories?
-- Generate interesting visualizations of your data?
-
-WasReal makes it easy to unlock the potential of your BeReal data.
+WasReal makes it easy to extract your BeReal pictures and save it in a format that you can use for other purposes.
 
 ## Getting Started
 
@@ -40,6 +36,10 @@ BeReal will send you a support message with a download link to a zip file contai
 1.  **Upload your zip file:** Once you receive your data, upload the zip file directly into WasReal. (Provide instructions on how to do this - link to a live demo or installation process.)
 2.  **Edit your data:** Use the intuitive interface to view and modify your BeReal data.
 3.  **Export your data:** Download your edited data in various formats. (List supported formats: JSON, CSV, etc.)
+
+You can use the tool online or host it on your own server.
+The tool is open-source, so you can modify it to suit your needs.
+Hosted version: [WasReal](https://was-real.netlify.app/)
 
 ## Features
 
