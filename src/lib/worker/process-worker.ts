@@ -19,30 +19,36 @@ export async function readZip(zipFile: File) {
 	}
 
 	isProcessing = true;
-	const reader = new BlobReader(zipFile);
-	const zip = new ZipReader(reader);
 
-	const files = await zip.getEntries();
+	try {
+		const reader = new BlobReader(zipFile);
+		const zip = new ZipReader(reader);
 
-	for (const entry of files) {
-		if (!entry.getData) {
-			continue;
+		const files = await zip.getEntries();
+
+		for (const entry of files) {
+			if (!entry.getData) {
+				continue;
+			}
+
+			if (entry.filename !== 'posts.json' && !entry.filename.startsWith('Photos/post')) {
+				continue;
+			}
+
+			const blob = await entry.getData(new BlobWriter());
+			if (!blob || blob.size === 0) {
+				continue;
+			}
+
+			const { folder, filename } = await getFolder(entry.filename);
+			await storeEntry(blob, folder, filename);
 		}
-
-		if (entry.filename !== 'posts.json' && !entry.filename.startsWith('Photos/post')) {
-			continue;
-		}
-
-		const blob = await entry.getData(new BlobWriter());
-		if (!blob || blob.size === 0) {
-			continue;
-		}
-
-		const { folder, filename } = await getFolder(entry.filename);
-		await storeEntry(blob, folder, filename);
+	} catch (error) {
+		console.error('Error reading zip:', error);
+		throw error;
+	} finally {
+		isProcessing = false;
 	}
-
-	isProcessing = false;
 }
 
 async function getImages(post: Post) {
@@ -80,10 +86,15 @@ async function getPosts() {
 		await init();
 	}
 
-	const postsHandle = await root.getFileHandle('posts.json');
-	assert(postsHandle, 'Posts file not found');
-	const posts: Post[] = await readAsJson(postsHandle);
-	return posts;
+	try {
+		const postsHandle = await root.getFileHandle('posts.json');
+		assert(postsHandle, 'Posts file not found');
+		const posts: Post[] = await readAsJson(postsHandle);
+		return posts;
+	} catch (error) {
+		console.error('Error reading posts:', error);
+		throw error;
+	}
 }
 
 async function getProgress() {
@@ -111,9 +122,14 @@ async function storeEntry(entry: Blob, folder: FileSystemDirectoryHandle, path: 
 }
 
 async function readAsJson(file: FileSystemFileHandle) {
-	const fileContents = await file.getFile();
-	const content = await fileContents.text();
-	return JSON.parse(content);
+	try {
+		const fileContents = await file.getFile();
+		const content = await fileContents.text();
+		return JSON.parse(content);
+	} catch (e) {
+		console.error(e);
+		throw e;
+	}
 }
 
 async function getFolder(path: string) {
@@ -217,22 +233,31 @@ async function fuseImages(primary: string, secondary: string, options: { asBlob?
 }
 
 async function urlToBitmap(url: string) {
-	const response = await fetch(url);
-	const blob = await response.blob();
-	return createImageBitmap(blob);
+	try {
+		const response = await fetch(url);
+		const blob = await response.blob();
+		return createImageBitmap(blob);
+	} catch (e) {
+		console.error(e);
+		throw e;
+	}
 }
 
 async function processAllPosts() {
 	const posts = await getPosts();
 	const zip = new ZipWriter(new BlobWriter('application/zip'), { bufferedWrite: true });
 	for (const post of posts) {
-		const [primary, secondary] = await getImages(post);
-		const blob = (await fuseImages(primary, secondary, { asBlob: true })) as Blob;
-		const filename = post.primary.path.split('/').at(-1)! + '.jpg';
+		try {
+			const [primary, secondary] = await getImages(post);
+			const blob = (await fuseImages(primary, secondary, { asBlob: true })) as Blob;
+			const filename = post.primary.path.split('/').at(-1)! + '.jpg';
 
-		const path = `fused/${filename}`;
-		await zip.add(path, new BlobReader(blob));
-		console.log('Fused image added to zip:', path);
+			const path = `fused/${filename}`;
+			await zip.add(path, new BlobReader(blob));
+			console.log('Fused image added to zip:', path);
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	const zipBlob = await zip.close();
