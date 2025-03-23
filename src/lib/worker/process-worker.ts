@@ -66,7 +66,7 @@ export async function readZip(zipFile: File) {
 }
 
 async function getImages(post: Post) {
-	return Promise.all([readImageAsUrl(post.secondary.path), readImageAsUrl(post.primary.path)]);
+	return Promise.all([readImageAsUrl(post.primary.path), readImageAsUrl(post.secondary.path)]);
 }
 
 async function getImageFile(path: string) {
