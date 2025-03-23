@@ -15,6 +15,7 @@
 
 	onMount(async () => {
 		const worker = getWorkerInstance();
+		await worker.init();
 		posts = await worker.getPosts();
 
 		// scroll to top

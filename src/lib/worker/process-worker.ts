@@ -10,6 +10,10 @@ let isProcessing = false;
 
 async function init() {
 	root = await navigator.storage.getDirectory();
+
+	// pre-cache posts folder
+	await getFolder('Photos/post/any.jpg');
+
 	isInitialized = true;
 }
 
@@ -31,12 +35,22 @@ export async function readZip(zipFile: File) {
 				continue;
 			}
 
-			if (entry.filename !== 'posts.json' && !entry.filename.startsWith('Photos/post')) {
+			const isPostJson = entry.filename === 'posts.json';
+			const isPostImage = entry.filename.startsWith('Photos/post');
+			const isBerealImage = entry.filename.includes('/bereal/');
+			if (!isPostJson && !isPostImage && !isBerealImage) {
 				continue;
 			}
 
 			const blob = await entry.getData(new BlobWriter());
 			if (!blob || blob.size === 0) {
+				continue;
+			}
+
+			if (isBerealImage) {
+				const filename = entry.filename.split('/').at(-1)!;
+				const { folder } = await getFolder('Photos/post/any.jpg');
+				await storeEntry(blob, folder, filename);
 				continue;
 			}
 
@@ -60,22 +74,35 @@ async function getImageFile(path: string) {
 		await init();
 	}
 
-	// '/Photos/<id>/post/<filename>'
-	// id needs to be removed
-	const filename = path.split('/').at(-1)!;
-	path = 'Photos/post/' + filename;
+	const isBerealImage = path.includes('/bereal/');
+	if (isBerealImage) {
+		const filename = path.split('/').at(-1)!;
+		path = 'Photos/post/' + filename;
 
-	const { folder } = await getFolder(path);
-	const fileHandle = await folder.getFileHandle(filename);
-	const file = await fileHandle.getFile();
-	return file;
+		const { folder } = await getFolder(path);
+		const fileHandle = await folder.getFileHandle(filename);
+		return fileHandle.getFile();
+	}
+
+	try {
+		// '/Photos/<id>/post/<filename>'
+		// id needs to be removed
+		const filename = path.split('/').at(-1)!;
+		path = 'Photos/post/' + filename;
+
+		const { folder } = await getFolder(path);
+		const fileHandle = await folder.getFileHandle(filename);
+		return fileHandle.getFile();
+	} catch (error) {
+		console.error('Error reading image:', error);
+		throw error;
+	}
 }
 
 async function readImageAsUrl(path: string) {
 	if (!isInitialized) {
 		await init();
 	}
-
 	const file = await getImageFile(path);
 	const url = URL.createObjectURL(file);
 	return url;
@@ -132,6 +159,8 @@ async function readAsJson(file: FileSystemFileHandle) {
 	}
 }
 
+const folderCache = new Map<string, FileSystemDirectoryHandle>();
+
 async function getFolder(path: string) {
 	const parts = path.split('/').filter(Boolean);
 	let currentFolder = root;
@@ -140,9 +169,22 @@ async function getFolder(path: string) {
 	const filename = parts.pop();
 	assert(filename, 'Filename not found');
 
+	const folderPath = parts.join('/');
+
+	// check if folder is already cached
+	const cachedFolder = folderCache.get(folderPath);
+	if (cachedFolder) {
+		return { folder: cachedFolder, filename };
+	}
+
+	console.log('Creating folder:', folderPath);
+
 	for (const part of parts) {
 		currentFolder = await currentFolder.getDirectoryHandle(part, { create: true });
 	}
+
+	// cache the folder
+	folderCache.set(folderPath, currentFolder);
 
 	return { folder: currentFolder, filename };
 }

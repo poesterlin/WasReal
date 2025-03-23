@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { getWorkerInstance } from '$lib/worker/helper';
+	import { IconUpload } from '@tabler/icons-svelte';
 
 	let dragActive = $state(false);
 	let fileInput = $state<HTMLInputElement>();
@@ -77,20 +78,7 @@
 		{:else}
 			<div class="space-y-6">
 				<div class="flex justify-center text-5xl text-white/80">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-24 w-24 transform transition-transform duration-300 hover:scale-110"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="1.5"
-							d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-						/>
-					</svg>
+					<IconUpload class="h-auto w-20" />
 				</div>
 				<div class="space-y-4">
 					<p class="text-xl font-medium text-white">Drop your ZIP file here</p>
