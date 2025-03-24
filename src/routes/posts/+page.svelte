@@ -5,6 +5,7 @@
 	import Cell from './Post.svelte';
 	import { assert, downloadBlobUrl } from '$lib/util';
 	import { IconDownload } from '@tabler/icons-svelte';
+	import { goto } from '$app/navigation';
 
 	let posts: Post[] = $state([]);
 	let num = $state(30);
@@ -17,6 +18,10 @@
 		const worker = getWorkerInstance();
 		await worker.init();
 		posts = await worker.getPosts();
+
+		if (posts.length === 0) {
+			return goto('/');
+		}
 
 		// scroll to top
 		window.scrollTo(0, 0);
