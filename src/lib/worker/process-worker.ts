@@ -312,7 +312,7 @@ async function processAllPosts() {
 			addToAverage(duration);
 			const filename = post.primary.path.split('/').at(-1)! + '.jpg';
 
-			const path = `fused/${filename}`;
+			const path = filename;
 			await zip.add(path, new BlobReader(blob));
 		} catch (e) {
 			console.error(e);
