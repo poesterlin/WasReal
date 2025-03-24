@@ -27,6 +27,14 @@ export function isSameDay(date1?: Date, date2?: Date) {
 	);
 }
 
+export function isAfterDay(date1?: Date, date2?: Date) {
+	if (!date1 || !date2) {
+		return false;
+	}
+
+	return date1 > date2;
+}
+
 export function throttle<T extends (...args: any[]) => void>(fn: T, wait: number) {
 	let lastCalled = 0;
 

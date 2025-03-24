@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import type { Post } from '$lib/bereal';
-	import { assert, downloadBlobUrl, getStartOfDay, isSameDay } from '$lib/util';
+	import { assert, downloadBlobUrl, getStartOfDay, isAfterDay, throttle } from '$lib/util';
 	import { getWorkerInstance } from '$lib/worker/helper';
 	import { IconDownload } from '@tabler/icons-svelte';
 	import { onMount } from 'svelte';
@@ -20,7 +20,7 @@
 	let dates = $derived(
 		[...new Set(posts.map((post) => getStartOfDay(new Date(post.takenAt))))].sort()
 	);
-	let currentDate = $state(new Date());
+	let currentDate = $state(dates[0] ?? new Date());
 
 	onMount(async () => {
 		const worker = getWorkerInstance();
@@ -35,9 +35,9 @@
 		window.scrollTo(0, 0);
 	});
 
-	function getMore(post: Post) {
+	const setCurrent = throttle((post: Post) => {
 		currentDate = new Date(post.takenAt);
-	}
+	}, 100);
 
 	async function processAllPosts() {
 		assert(dialog);
@@ -71,8 +71,14 @@
 	}
 
 	function scrollGridTo(date: Date) {
-		const index = posts.findIndex((d) => isSameDay(new Date(d.takenAt), date));
+		const index = posts.findIndex((d) => isAfterDay(new Date(d.takenAt), date));
+
+		if (index === -1) {
+			return;
+		}
+
 		const scrollPercentage = index / posts.length;
+
 		assert(container);
 		container.scrollTo({
 			top: scrollPercentage * (container.scrollHeight - container.clientHeight),
@@ -107,8 +113,8 @@
 		bind:this={container}
 		class="grid flex-1 grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-4 p-4 md:overflow-y-auto"
 	>
-		{#each posts as post (post.primary.path)}
-			<Cell {post} onVisible={() => getMore(post)} {isScrolling} />
+		{#each posts as post, idx (post.primary.path)}
+			<Cell {post} onVisible={() => setCurrent(post)} {idx} />
 		{/each}
 	</div>
 

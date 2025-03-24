@@ -53,27 +53,27 @@
 
 	function setCurrentDate(year: string, month: number) {
 		const date = new Date(parseInt(year, 10), month);
+		scrollTo(year, month);
 		currentDate = date;
 		setDate(date);
-		scrollTo(year, month);
 	}
 
 	function scrollTo(year: string | number, month: number) {
 		assert(sliderContainer);
 
-		const yearLabel = sliderContainer.querySelector(
+		const button = sliderContainer.querySelector(
 			`button[aria-label="${year} ${new Date(0, month).toLocaleString(undefined, {
 				month: 'long'
 			})}"]`
 		) as HTMLButtonElement;
 
-		if (!yearLabel) {
-			console.log('Year label not found');
+		if (!button) {
+			console.error('Button not found');
 			return;
 		}
 
 		sliderContainer.scrollTo({
-			top: yearLabel.offsetTop - sliderContainer.offsetTop - 52,
+			top: button.offsetTop - sliderContainer.offsetTop - 52,
 			behavior: 'smooth'
 		});
 	}
@@ -90,7 +90,7 @@
 	{#each Object.keys(groupedDates).sort((a, b) => a.localeCompare(b)) as year}
 		<!-- Year Label -->
 		<div
-			class="sticky top-0 z-10 rounded-b-lg border-b border-pink-300 bg-white/20 p-2 text-xl font-bold text-pink-600 drop-shadow-lg backdrop-blur-lg"
+			class="sticky top-0 z-10 rounded-l-lg rounded-b-lg bg-pink-50 p-2 text-xl font-bold text-pink-700 drop-shadow-sm"
 		>
 			{year}
 		</div>
@@ -99,10 +99,10 @@
 		{#if months}
 			{#each months as month}
 				{@const monthName = new Date(0, month).toLocaleString(undefined, { month: 'long' })}
-				<!-- Month Button (with number of entries) -->
+				<!-- Month Button -->
 				<button
-					class:highlight={!isScrolling && isDateInMonth(currentDate, year, month)}
-					class="rounded-lg bg-white/20 p-2 p-2 pr-5 pl-4 text-lg font-medium text-gray-800 shadow-md backdrop-blur-lg transition-all duration-200 ease-in-out hover:bg-pink-100"
+					class:active-month={!isScrolling && isDateInMonth(currentDate, year, month)}
+					class="mx-2 rounded-lg bg-pink-50/30 px-4 py-2 text-lg font-medium text-black shadow transition-all duration-200 ease-in-out hover:bg-pink-100/50"
 					aria-label="{year} {monthName}"
 					onclick={() => setCurrentDate(year, month)}
 				>
@@ -114,23 +114,20 @@
 </div>
 
 <style>
-	/* Additional custom style for the highlighted button */
-	.highlight {
-		background-color: #f472b6;
-		color: white;
-		box-shadow: 0 0 0 2px #f472b6;
+	/* Custom style for the active month button */
+	.active-month {
+		background-color: var(--color-pink-50) !important;
 	}
 
 	/* Optional: custom scrollbar for a cute touch */
-	/* You can remove or adjust these as needed */
 	::-webkit-scrollbar {
 		width: 6px;
 	}
 	::-webkit-scrollbar-track {
-		background: rgba(255, 192, 203, 0.2); /* light pink track */
+		background: rgba(245, 208, 215, 0.4); /* soft pink track */
 	}
 	::-webkit-scrollbar-thumb {
-		background-color: rgba(255, 105, 180, 0.6); /* hot pink thumb */
+		background-color: rgba(244, 114, 182, 0.6); /* vibrant pink thumb */
 		border-radius: 3px;
 	}
 </style>

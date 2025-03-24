@@ -5,13 +5,10 @@
 	import { IconDownload, IconTransfer } from '@tabler/icons-svelte';
 	import { assert, downloadBlobUrl } from '$lib/util';
 
-	let {
-		post,
-		onVisible,
-		isScrolling
-	}: { post: Post; onVisible: () => void; isScrolling: boolean } = $props();
+	let { post, onVisible, idx }: { post: Post; onVisible: () => void; idx: number } = $props();
+
 	let el = $state<HTMLElement>();
-	let loadImage = $state(false);
+	let loadImage = $state(idx < 20);
 	let primaryImg = $state('');
 	let secondaryImg = $state('');
 	let width = $state(0);
@@ -27,13 +24,9 @@
 					onVisible();
 				}
 
-				if (isScrolling) {
-					return;
-				}
-
 				if (entry.isIntersecting) {
-					loadImage = true;
 					getImages();
+					loadImage = true;
 				}
 			},
 			{ threshold: [0, 0.7] }
@@ -47,7 +40,6 @@
 		if (!loadImage || primaryImg || secondaryImg) {
 			return;
 		}
-
 		const worker = getWorkerInstance();
 		const images = await worker.getImages($state.snapshot(post));
 		primaryImg = images[0];
