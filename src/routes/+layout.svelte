@@ -62,3 +62,11 @@
 		</div>
 	{/each}
 </main>
+
+<nav>
+	<ul class="mt-8 flex justify-center space-x-4">
+		<li>
+			<a href="/privacy" class="text-gray-600 hover:text-gray-800"> Privacy </a>
+		</li>
+	</ul>
+</nav>
