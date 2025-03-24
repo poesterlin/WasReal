@@ -1,18 +1,26 @@
 <script lang="ts">
-	import type { Post } from '$lib/bereal';
-	import { getWorkerInstance } from '$lib/worker/helper';
-	import { onMount } from 'svelte';
-	import Cell from './Post.svelte';
-	import { assert, downloadBlobUrl } from '$lib/util';
-	import { IconDownload } from '@tabler/icons-svelte';
 	import { goto } from '$app/navigation';
+	import type { Post } from '$lib/bereal';
+	import { assert, downloadBlobUrl, getStartOfDay, isSameDay } from '$lib/util';
+	import { getWorkerInstance } from '$lib/worker/helper';
+	import { IconDownload } from '@tabler/icons-svelte';
+	import { onMount } from 'svelte';
+	import Dateslider from './Dateslider.svelte';
+	import Cell from './Post.svelte';
 
 	let posts: Post[] = $state([]);
-	let num = $state(30);
 	let dialog = $state<HTMLDialogElement>();
+	let container = $state<HTMLDivElement>();
 	let open = $state(false);
 	let progress = $state(0);
 	let formattedEta = $state('');
+	let isScrolling = $state(false);
+
+	// Get unique sorted dates from images
+	let dates = $derived(
+		[...new Set(posts.map((post) => getStartOfDay(new Date(post.takenAt))))].sort()
+	);
+	let currentDate = $state(new Date());
 
 	onMount(async () => {
 		const worker = getWorkerInstance();
@@ -27,8 +35,8 @@
 		window.scrollTo(0, 0);
 	});
 
-	function getMore() {
-		num += 1;
+	function getMore(post: Post) {
+		currentDate = new Date(post.takenAt);
 	}
 
 	async function processAllPosts() {
@@ -61,6 +69,17 @@
 
 		return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
 	}
+
+	function scrollGridTo(date: Date) {
+		const index = posts.findIndex((d) => isSameDay(new Date(d.takenAt), date));
+		const scrollPercentage = index / posts.length;
+		assert(container);
+		container.scrollTo({
+			top: scrollPercentage * (container.scrollHeight - container.clientHeight),
+			behavior: 'smooth'
+		});
+		isScrolling = true;
+	}
 </script>
 
 <button
@@ -74,17 +93,27 @@
 	</div>
 </button>
 
-<h1 class="font-display glass-effect mb-12 cursor-default py-8 pl-6 text-6xl font-bold md:text-5xl">
+<h1 class="font-display glass-effect mb-6 cursor-default py-8 pl-6 text-6xl font-bold md:text-5xl">
 	<span class="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-		✨ BeReal Memories ✨
+		<span class="hidden md:inline">✨</span> BeReal Memories
+		<span class="hidden md:inline">✨</span>
 	</span>
 </h1>
 
-<!-- grid -->
-<div class="grid gap-4 px-4">
-	{#each posts.slice(0, num) as post (post.primary.path)}
-		<Cell {post} onVisible={getMore} />
-	{/each}
+<div class="flex h-screen gap-4 md:h-[calc(100vh-11rem-30px)]">
+	<!-- Image Grid -->
+	<div
+		onscrollend={() => (isScrolling = false)}
+		bind:this={container}
+		class="grid flex-1 grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-4 p-4 md:overflow-y-auto"
+	>
+		{#each posts as post (post.primary.path)}
+			<Cell {post} onVisible={() => getMore(post)} {isScrolling} />
+		{/each}
+	</div>
+
+	<!-- Date Slider -->
+	<Dateslider {dates} {currentDate} setDate={(d) => scrollGridTo(d)} {isScrolling} />
 </div>
 
 <dialog
@@ -126,11 +155,6 @@
 		100% {
 			background-position: 200% center;
 		}
-	}
-
-	.grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 	}
 
 	dialog {
