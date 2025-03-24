@@ -47,18 +47,6 @@ Hosted version: [WasReal](https://was-real.netlify.app/)
 - **Data Export:** Download your data all at once or in parts
 - **[Add more features as needed]**
 
-## Contributing
-
-[Explain how others can contribute - if you want them to]
-
-Want to contribute to WasReal? Great! Here are some ways you can help:
-
-- Report bugs and suggest new features.
-- Improve the documentation.
-- Submit code changes via pull requests.
-
-Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more detailed information.
-
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
