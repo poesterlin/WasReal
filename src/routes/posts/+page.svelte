@@ -2,10 +2,9 @@
 	import type { Post } from '$lib/bereal';
 	import { getWorkerInstance } from '$lib/worker/helper';
 	import { onMount } from 'svelte';
-	import Cell from './Cell.svelte';
+	import Cell from './Post.svelte';
 	import { assert, downloadBlobUrl } from '$lib/util';
 	import { IconDownload } from '@tabler/icons-svelte';
-	import Progress from './Progress.svelte';
 
 	let posts: Post[] = $state([]);
 	let num = $state(30);
@@ -70,26 +69,63 @@
 	</div>
 </button>
 
+<h1 class="font-display glass-effect mb-12 cursor-default py-8 pl-6 text-6xl font-bold md:text-5xl">
+	<span class="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+		✨ BeReal Memories ✨
+	</span>
+</h1>
+
 <!-- grid -->
-<div class="grid">
+<div class="grid gap-4 px-4">
 	{#each posts.slice(0, num) as post (post.primary.path)}
 		<Cell {post} onVisible={getMore} />
 	{/each}
 </div>
 
-<dialog bind:this={dialog} class="glass-effect" open={false} class:open>
-	<div class="flex flex-col items-center gap-4 text-black">
-		<Progress {progress} />
-		<h2 class="underline">Processing Images</h2>
-		<p class="text-sm">ca. {formattedEta} left</p>
+<dialog
+	bind:this={dialog}
+	class="glass-effect relative overflow-hidden rounded-xl p-6"
+	open={false}
+	class:open
+>
+	<div
+		class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-pink-200/40 to-purple-200/40 transition-all duration-300"
+		style="width: {progress}%"
+	></div>
+
+	<div class="flex flex-col items-center gap-4 text-gray-800">
+		<div class="animate-bounce">
+			<span class="text-2xl">🌟</span>
+		</div>
+
+		<h2 class="font-display relative text-xl">
+			<span class="relative">
+				Processing your memories...
+				<span
+					class="absolute -bottom-1 left-0 h-0.5 w-full bg-gradient-to-r from-pink-400 to-purple-400"
+				></span>
+			</span>
+		</h2>
+
+		<p class="text-black-600 flex items-center gap-2 text-sm font-semibold">
+			{formattedEta} remaining
+		</p>
 	</div>
 </dialog>
 
 <style>
+	@keyframes shimmer {
+		0% {
+			background-position: -200% center;
+		}
+		100% {
+			background-position: 200% center;
+		}
+	}
+
 	.grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 1rem;
 	}
 
 	dialog {
@@ -106,7 +142,8 @@
 	}
 
 	dialog::backdrop {
-		background: rgba(0, 0, 0, 0.6);
+		background: rgba(0, 0, 0, 0.219);
+		backdrop-filter: blur(2px);
 	}
 
 	dialog.open {

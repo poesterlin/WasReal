@@ -16,6 +16,7 @@
 			if (entry.isIntersecting) {
 				onVisible();
 				getImage();
+				observer.disconnect();
 			}
 		});
 
@@ -54,7 +55,7 @@
 		</button>
 	</div>
 
-	<img src={primaryImg} alt={post.caption} class="h-full w-full object-cover" />
+	<img src={primaryImg} alt={post.caption} class="h-full w-full rounded object-cover" />
 	<img
 		class="absolute top-3 left-3 h-auto w-[30%] rounded border border-white shadow"
 		src={secondaryImg}
