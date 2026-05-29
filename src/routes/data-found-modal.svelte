@@ -58,11 +58,11 @@
 	<div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm"></div>
 
 	<div class="fixed top-1/2 left-1/2 w-full max-w-xl -translate-x-1/2 -translate-y-1/2">
-		<div class="mx-4 rounded-2xl bg-pink-200/70 p-8 shadow-xl">
+		<div class="mx-4 rounded-2xl bg-amber-50 p-8 shadow-xl">
 			<div class="text-center">
 				<!-- Icon -->
 				<div
-					class="bg-gradient-custom mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full"
+					class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100"
 				>
 					<svg class="h-8 w-8 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path

@@ -92,7 +92,7 @@
 	onclick={processAllPosts}
 	class="glass-effect fixed right-4 bottom-4 z-50 rounded-lg text-black shadow-lg"
 >
-	<div class="flex items-center gap-2 rounded-lg bg-pink-200/60 p-2 pr-5 pl-4">
+	<div class="flex items-center gap-2 rounded-lg bg-amber-100/80 p-2 pr-5 pl-4">
 		<IconDownload></IconDownload>
 
 		Download All
@@ -100,7 +100,7 @@
 </button>
 
 <h1 class="font-display glass-effect mb-6 cursor-default py-8 pl-6 text-6xl font-bold md:text-5xl">
-	<span class="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+	<span class="bg-gradient-to-r from-gray-900 to-gray-500 bg-clip-text text-transparent">
 		<span class="hidden md:inline">✨</span> BeReal Memories
 		<span class="hidden md:inline">✨</span>
 	</span>
@@ -129,7 +129,7 @@
 	class:open
 >
 	<div
-		class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-pink-200/40 to-purple-200/40 transition-all duration-300"
+		class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-amber-200/60 to-orange-200/40 transition-all duration-300"
 		style="width: {progress}%"
 	></div>
 
@@ -142,7 +142,7 @@
 			<span class="relative">
 				Processing your memories...
 				<span
-					class="absolute -bottom-1 left-0 h-0.5 w-full bg-gradient-to-r from-pink-400 to-purple-400"
+					class="absolute -bottom-1 left-0 h-0.5 w-full bg-gradient-to-r from-amber-300 to-orange-300"
 				></span>
 			</span>
 		</h2>
@@ -154,15 +154,6 @@
 </dialog>
 
 <style>
-	@keyframes shimmer {
-		0% {
-			background-position: -200% center;
-		}
-		100% {
-			background-position: 200% center;
-		}
-	}
-
 	dialog {
 		position: fixed;
 		inset: 0;
